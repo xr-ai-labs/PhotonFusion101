@@ -35,6 +35,15 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
     }
 
+    private bool _mouseButtton0;
+    private bool _mouseButtton1;
+
+    private void Update()
+    {
+        _mouseButtton0 = _mouseButtton0 | Input.GetMouseButton(0);
+        _mouseButtton1 = _mouseButtton1 | Input.GetMouseButton(1);
+    }
+
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
@@ -55,6 +64,18 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             data.direction += Vector3.right;
         }
+
+        if(_mouseButtton0)
+        {
+            data.buttons |= NetworkInputData.MOUSEBUTTON1;
+        }
+        if(_mouseButtton1)
+        {
+            data.buttons |= NetworkInputData.MOUSEBUTTON2;
+        }
+
+        _mouseButtton0 = false;
+        _mouseButtton1 = false;
 
         input.Set(data);
     }
