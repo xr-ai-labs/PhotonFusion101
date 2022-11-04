@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : NetworkBehaviour
 {
@@ -44,6 +45,14 @@ public class Player : NetworkBehaviour
         _cc = GetComponent<NetworkCharacterControllerPrototype>();
     }
 
+    public void Update()
+    {
+        if(Object.HasInputAuthority && Input.GetKeyDown(KeyCode.R))
+        {
+            RPC_SendMessage("Hey there!");
+        }
+    }
+
     public override void FixedUpdateNetwork()
     {
         if(GetInput(out NetworkInputData data))
@@ -81,4 +90,25 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+    private Text _messages;
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_SendMessage(string message, RpcInfo info = default)
+    {
+        if (_messages == null)
+            _messages = FindObjectOfType<Text>(); 
+
+        if(info.IsInvokeLocal)
+        {
+            message = $"You said {message}\n";
+        }
+        else
+        {
+            message = $"Some other player said {message}\n";
+        }
+
+        _messages.text += message;
+    }
+
 }
